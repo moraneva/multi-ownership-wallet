@@ -1,4 +1,7 @@
 {
   "name": "multi-ownership-wallet",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "dependencies": {
+    "@openzeppelin/contracts": "^3.4.0"
+  }
 }
