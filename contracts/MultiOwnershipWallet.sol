@@ -30,20 +30,19 @@ contract MultiOwnershipWallet {
     /// @dev Contract constructor sets initial owners and % ownership breakdown.
     /// @param _owners List of initial owners.
     /// @param _ownership Number of required confirmations.
-    function MultiSigWallet(
+    constructor(
         address payable[] memory _owners,
         uint256[] memory _ownership,
         uint256 _requiredConfirmationPercentageForDistribution
-    ) public {
+    ) {
         require(
             _owners.length == _ownership.length,
             "Length of owners and ownership must match."
         );
 
         require(
-            _requiredConfirmationPercentageForDistribution > 0 &&
-                _requiredConfirmationPercentageForDistribution <= 100,
-            "requiredConfirmationPercentageForDistribution must be greater than 0 and less than 100"
+            _requiredConfirmationPercentageForDistribution > 0,
+            "requiredConfirmationPercentageForDistribution must be greater than 0"
         );
 
         for (uint256 i = 0; i < _owners.length; i++) {
@@ -56,6 +55,7 @@ contract MultiOwnershipWallet {
 
             isOwner[_owners[i]] = true;
             ownership[_owners[i]] = _ownership[i];
+            totalOwnership += _ownership[i];
         }
 
         owners = _owners;
@@ -101,10 +101,7 @@ contract MultiOwnershipWallet {
         distribution.executed = true;
 
         for (uint256 i = 0; i < owners.length; i++) {
-            uint256 percentageOwnership =
-                SafeMath.div(ownership[owners[i]], totalOwnership);
-            uint256 payment =
-                SafeMath.mul(address(this).balance, percentageOwnership);
+            uint256 payment = distribution.value * ownership[owners[i]] / totalOwnership;
 
             require(payment != 0, "Account is not due payment");
 
